@@ -1,15 +1,23 @@
 ---
 # Read the Docs configuration file
 # See https://docs.readthedocs.io/en/stable/config-file/v2.html for details
+#
+# The pre_build command checks if we're building a PR. If not, check out
+# doc/releases from the main branch so it's always up to date.
 
 version: 2
 formats: []
 build:
-  image: latest
+  os: ubuntu-22.04
+  tools:
+    python: "3.8"
   apt_packages:
     - ditaa
+  jobs:
+    pre_build:
+      - git branch | head -1 | grep -qv detached && git checkout origin/main -- doc/releases || true
+      - git status
 python:
-  version: 3.8
   install:
     - requirements: admin/doc-requirements.txt
     - requirements: admin/doc-read-the-docs.txt
